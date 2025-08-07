@@ -36,7 +36,7 @@ kbd{padding:2px 4px;border:1px solid var(--border);border-radius:4px;font-size:1
 small{font-size:12px;color:color-mix(in srgb,var(--fg) 60%,transparent)}
 .footer{text-align:right;margin-top:18px;font-size:12px;color:color-mix(in srgb,var(--fg) 60%,transparent)}
 a{color:var(--accent);text-decoration:none}
-#hk{caret-color:transparent}   /* hide text-caret in hot-key box */
+#hk{caret-color:transparent}
 </style>
 </head>
 <body>
@@ -58,10 +58,10 @@ a{color:var(--accent);text-decoration:none}
     <option value="hi-IN">hi-IN</option>
   </select>
 
-  <label>API key <small>(looks like <code>AIzaSy…</code>)</small></label>
-  <input id="gkey" placeholder="AIza…">
+  <label>API key</label>
+  <input id="gkey" placeholder="AIza">
 
-  <label>Model</label>
+  <label>GEMINI Model</label>
   <select id="gmodel">
     <option value="">speech-to-text-001 (Cloud STT – recommended)</option>
     <option value="gemini-1.5-pro-latest">gemini-1.5-pro-latest</option>
@@ -70,7 +70,7 @@ a{color:var(--accent);text-decoration:none}
   </select>
 
   <div class="footer">
-    Need help? <a href="https://support.voicetypist.app" target="_blank">Docs</a>
+    Need help? <a href="" target="_blank">Docs</a>
   </div>
 </div>
 

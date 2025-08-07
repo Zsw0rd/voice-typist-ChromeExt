@@ -1,4 +1,4 @@
-/*  Voice Typist – content.js  (v0.2.3)  */
+/*  Voice Typist – content.js  */
 
 let cfg = { hotkey:'Ctrl+Space', mode:'webspeech', language:'en-US' };
 chrome.storage.sync.get(cfg, s => { cfg = {...cfg, ...s}; hk = parseHK(cfg.hotkey); });
@@ -119,7 +119,7 @@ function insertText(text){
     const pos = st+text.length;
     target.setSelectionRange(pos,pos);
     target.dispatchEvent(new Event('input',{bubbles:true}));
-    target.dispatchEvent(new Event('change',{bubbles:true})); // ★ fixes YouTube
+    target.dispatchEvent(new Event('change',{bubbles:true})); 
   }else if(target.isContentEditable){
     const sel=getSelection(); if(!sel.rangeCount) return;
     const r=sel.getRangeAt(0);
