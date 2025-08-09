@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Voice Assistant</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;}
+.container{width:320px;padding:16px;background:linear-gradient(135deg,#0ea5e9,#4f46e5);color:#fff}
+.card{background:#0b1220cc;border-radius:16px;padding:16px;backdrop-filter:blur(6px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+.h{font-weight:700;font-size:16px;margin:0 0 8px}
+.s{opacity:.85;font-size:12px;margin:0 0 14px}
+.row{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
+.tag{background:#111827;border:1px solid #374151;color:#e5e7eb;border-radius:999px;padding:6px 10px;font-size:12px}
+.btn{width:100%;border:0;border-radius:12px;padding:12px 14px;font-weight:600;cursor:pointer;background:#22d3ee;color:#0b1220}
+.btn:active{transform:translateY(1px)}
+.k{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;background:#111827;color:#f3f4f6;border-radius:8px;padding:6px 8px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h1 class="h">Voice Assistant Anywhere</h1>
+    <p class="s">Hold your hotkey to dictate. Mode and model can be changed in Options.</p>
+    <div class="row"><div>Today</div><div id="d" class="tag">0</div></div>
+    <div class="row"><div>Month</div><div id="m" class="tag">0</div></div>
+    <div class="row"><div>Total</div><div id="t" class="tag">0</div></div>
+    <div class="row"><div>Hotkey</div><div id="hk" class="k">—</div></div>
+    <button class="btn" id="go">Open Options</button>
+  </div>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

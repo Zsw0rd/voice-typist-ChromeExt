@@ -2,78 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Voice Typist · Settings</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Voice Assistant – Options</title>
 <style>
-:root{
-  --bg:#f6f8fa; --card:#fff; --fg:#1f2428; --accent:#2563eb; --border:#d0d7de;
-}
-@media (prefers-color-scheme:dark){
-  :root{
-    --bg:#0d1117; --card:#161b22; --fg:#c9d1d9; --accent:#3b82f6; --border:#30363d;
-  }
-}
-*{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--fg);}
-body{
-  margin:0;display:flex;align-items:center;justify-content:center;
-  min-height:100vh;background:var(--bg);padding:16px;
-}
-.card{
-  width:100%;max-width:420px;background:var(--card);padding:24px 28px;
-  border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.05);
-}
-h2{margin:0 0 18px;font-size:20px;font-weight:600;color:var(--fg);}
-label{display:block;margin:14px 0 6px;font-weight:500;font-size:14px}
-input,select{
-  width:100%;padding:10px 12px;font-size:14px;border:1px solid var(--border);
-  border-radius:10px;background:transparent;transition:border .2s;
-}
-input:focus,select:focus{
-  outline:none;border-color:var(--accent);
-  box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 40%,transparent);
-}
-kbd{padding:2px 4px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:color-mix(in srgb,var(--accent) 10%,transparent)}
-small{font-size:12px;color:color-mix(in srgb,var(--fg) 60%,transparent)}
-.footer{text-align:right;margin-top:18px;font-size:12px;color:color-mix(in srgb,var(--fg) 60%,transparent)}
-a{color:var(--accent);text-decoration:none}
-#hk{caret-color:transparent}
+  :root{--bg:#0b1220;--card:#0f172acc;--line:#1f2937;--text:#e5e7eb;--muted:#94a3b8;--accent:#22d3ee;--accent2:#6366f1;--danger:#ef4444}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:linear-gradient(135deg,#0ea5e9,#4f46e5);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;color:var(--text)}
+.wrap{max-width:980px;margin:24px auto;padding:24px}
+header{margin-bottom:16px}
+header h1{margin:0 0 6px;font-size:28px}
+header .sub{opacity:.85}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 10px 24px rgba(0,0,0,.25);backdrop-filter:blur(8px)}
+.card-h{font-weight:700;margin-bottom:12px}
+.field{margin:12px 0}
+label{display:block;margin:0 0 6px;color:var(--muted);font-size:12px}
+input,select,button{font:inherit}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--text);outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+.hotkey{display:flex;gap:8px}
+.hotkey input{flex:1;text-transform:uppercase}
+.ghost{background:#0b1220;border:1px dashed var(--line);color:var(--muted);border-radius:12px;padding:12px 14px;cursor:pointer}
+.ghost:hover{border-color:var(--accent)}
+.hint{font-size:12px;color:var(--muted)}
+.usage{display:flex;gap:12px}
+.u-item{flex:1;background:#0b1220;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.u-label{font-size:12px;color:var(--muted)}
+.u-val{font-size:22px;font-weight:800}
+.danger{background:var(--danger);border:0;color:white;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer}
+footer{margin-top:16px;opacity:.8}
+.reveal{display:none}
+.reveal.on{display:block}
 </style>
 </head>
 <body>
-<div class="card">
-  <h2>Voice Typist Settings</h2>
+<div class="wrap">
+  <header>
+    <h1>Voice Assistant Anywhere</h1>
+    <div class="sub">Catchy, simple controls. Choose mode, model, hotkey, and track usage.</div>
+  </header>
+  <section class="grid">
+    <div class="card">
+      <div class="card-h">Mode</div>
+      <div class="field">
+        <label>Engine</label>
+        <select id="mode">
+          <option value="webspeech">Web Speech (default)</option>
+          <option value="gemini">Gemini (API)</option>
+        </select>
+      </div>
+      <div id="geminiBox" class="reveal">
+        <div class="field">
+          <label>Gemini Model</label>
+          <select id="model">
+            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            <option value="gemini-2.0-pro">gemini-2.0-pro</option>
+            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>API Key</label>
+          <input id="key" type="password" placeholder="Paste your Gemini API key" />
+        </div>
+        <div class="field">
+          <label>Gemini Action</label>
+          <select id="gaction">
+            <option value="echo">Transcribe only (no AI reply)</option>
+            <option value="reply">AI reply (replace text)</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-  <label>Push-to-talk hot key</label>
-  <input id="hk" placeholder="Ctrl + Space">
+    <div class="card">
+      <div class="card-h">Push-to-talk</div>
+      <div class="field">
+        <label>Hotkey</label>
+        <div class="hotkey">
+          <input id="hotkey" type="text" placeholder="Press keys…" autocomplete="off" />
+          <button id="clear" class="ghost">Clear</button>
+        </div>
+        <div class="hint">Hold this combo to start, release to stop. Backspace clears.</div>
+      </div>
+      <div class="field">
+        <label>Language</label>
+        <select id="lang">
+          <option value="en-US">English (US)</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="hi-IN">Hindi (India)</option>
+          <option value="de-DE">German</option>
+          <option value="fr-FR">French</option>
+          <option value="es-ES">Spanish</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Paste Mode</label>
+        <select id="paste">
+          <option value="insert">Insert at cursor</option>
+          <option value="replace">Replace selection</option>
+        </select>
+      </div>
+    </div>
 
-  <label>Mode</label>
-  <select id="mode">
-    <option value="webspeech">Web Speech (built-in)</option>
-    <option value="gemini">Google Cloud Speech / Gemini</option>
-  </select>
-
-  <label>Language tag <small>(e.g. <kbd>en-US</kbd>, <kbd>hi-IN</kbd>)</small></label>
-  <select id="lang">
-    <option value="en-US">en-US</option>
-    <option value="hi-IN">hi-IN</option>
-  </select>
-
-  <label>API key</label>
-  <input id="gkey" placeholder="AIza">
-
-  <label>GEMINI Model</label>
-  <select id="gmodel">
-    <option value="">speech-to-text-001 (Cloud STT – recommended)</option>
-    <option value="gemini-1.5-pro-latest">gemini-1.5-pro-latest</option>
-    <option value="gemini-pro-vision">gemini-pro-vision</option>
-    <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-  </select>
-
-  <div class="footer">
-    Need help? <a href="" target="_blank">Docs</a>
-  </div>
+    <div class="card">
+      <div class="card-h">Usage</div>
+      <div class="usage">
+        <div class="u-item"><div class="u-label">Today</div><div id="u-day" class="u-val">0</div></div>
+        <div class="u-item"><div class="u-label">Month</div><div id="u-month" class="u-val">0</div></div>
+        <div class="u-item"><div class="u-label">Total</div><div id="u-total" class="u-val">0</div></div>
+      </div>
+      <div class="field">
+        <button id="reset" class="danger">Reset Counters</button>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div>Ensure microphone permission is allowed for sites you use.</div>
+  </footer>
 </div>
-
+<script src="common.js"></script>
 <script src="options.js"></script>
 </body>
 </html>
+
+
