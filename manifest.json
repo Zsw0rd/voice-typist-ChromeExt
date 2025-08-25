@@ -1,10 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Voice Assistant Anywhere",
-  "version": "1.0.0",
-  "description": "Push‑to‑talk dictation and Gemini AI replies in any input or editor.",
-  "permissions": ["storage", "activeTab", "scripting", "tabs"],
-  "host_permissions": ["https://*/*", "http://*/*", "https://generativelanguage.googleapis.com/*"],
+  "version": "1.0.3",
+  "description": "Push-to-talk dictation and Gemini AI replies in any input or editor.",
+  "permissions": ["storage"],
   "background": { "service_worker": "background.js" },
   "options_page": "options.html",
   "action": { "default_popup": "popup.html", "default_title": "Voice Assistant" },
@@ -13,8 +12,9 @@
     {
       "matches": ["<all_urls>"],
       "js": ["common.js", "content.js"],
-      "run_at": "document_idle",
-      "all_frames": true
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
     }
   ]
 }

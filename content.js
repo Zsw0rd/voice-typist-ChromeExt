@@ -1,5 +1,7 @@
 let recognition=null,settings=null,hotkey=null,holdDown=false,targetEl=null;
 
+function safeSend(m,cb){ try{ if(chrome?.runtime?.id) chrome.runtime.sendMessage(m,cb); }catch(_){} }
+
 function ensureRecognition(){
   if(recognition) return recognition;
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -11,15 +13,27 @@ function ensureRecognition(){
   recognition.onresult=e=>{
     const text=Array.from(e.results).map(r=>r[0].transcript).join(' ').trim();
     if(!text) return;
+
+    if(isDocs()){
+      const docsInput=findDocsSearchInput(targetEl)||findDocsSearchInput(deepActive())||findDocsSearchInput();
+      if(docsInput){
+        pasteTextIntoInput(docsInput,text);
+        const n=text.split(/\s+/).filter(Boolean).length;
+        safeSend({type:'va_bump',n});
+        return;
+      }
+      return;
+    }
+
     const action=(settings?.mode==='gemini')?(settings?.geminiAction||'echo'):'echo';
     if(action==='reply'){
-      chrome.runtime.sendMessage({type:'va_generate',prompt:text},res=>{
+      safeSend({type:'va_generate',prompt:text},res=>{
         if(res?.ok) pasteText(res.text,targetEl);
       });
     }else{
       pasteText(text,targetEl);
       const n=text.split(/\s+/).filter(Boolean).length;
-      chrome.runtime.sendMessage({type:'va_bump',n});
+      safeSend({type:'va_bump',n});
     }
   };
   recognition.onend=()=>{ if(holdDown) tryStart(); };
@@ -41,6 +55,40 @@ function deepActive(root=document){
     ae=next;
   }
   return ae||document.activeElement;
+}
+
+function isDocs(){
+  return location.hostname.endsWith('docs.google.com') && location.pathname.startsWith('/document/');
+}
+
+function isVisible(el){
+  if(!el) return false;
+  const r=el.getBoundingClientRect();
+  return r.width>0 && r.height>0 && getComputedStyle(el).visibility!=='hidden';
+}
+
+function isDocsSearchEl(el){
+  if(!el || el.tagName!=='INPUT') return false;
+  const a=(el.getAttribute('aria-label')||'').toLowerCase();
+  const id=(el.id||'').toLowerCase();
+  const ph=(el.getAttribute('placeholder')||'').toLowerCase();
+  const cls=(el.className||'')+'';
+  if(!(isVisible(el) && !el.disabled)) return false;
+  return (
+    a.includes('search') || a.includes('find') ||
+    id.includes('search') || id.includes('menusearch') ||
+    ph.includes('search') || ph.includes('find') ||
+    cls.includes('docs-findinput-input')
+  );
+}
+
+function findDocsSearchInput(seed){
+  if(seed && isDocsSearchEl(seed)) return seed;
+  const nodes=[...document.querySelectorAll('input[type="text"],input[type="search"]')];
+  for(const el of nodes){ if(isDocsSearchEl(el)) return el; }
+  const panel=document.querySelector('div[aria-label*="Find"] input, div[aria-label*="Search"] input');
+  if(panel && panel.tagName==='INPUT') return panel;
+  return null;
 }
 
 function findYouTubeSearchInputFrom(el){
@@ -78,11 +126,20 @@ function dispatchCEInsert(el,t){
   el.dispatchEvent(inputEvt);
 }
 
-function insertIntoTextControl(el,t){
+function pasteTextIntoInput(el,t){
   try{ el.focus({preventScroll:true}); }catch(_){}
-  const start=el.selectionStart??el.value.length;
-  const end=el.selectionEnd??el.value.length;
-  el.setRangeText(t,start,end,'end');
+  if(typeof el.setRangeText==='function'){
+    const start=el.selectionStart??el.value.length;
+    const end=el.selectionEnd??el.value.length;
+    el.setRangeText(t,start,end,'end');
+  }else{
+    const start=el.selectionStart??el.value.length;
+    const end=el.selectionEnd??el.value.length;
+    const val=el.value||'';
+    el.value=val.slice(0,start)+t+val.slice(end);
+    const pos=(start+t.length);
+    try{ el.setSelectionRange(pos,pos); }catch(_){}
+  }
   el.dispatchEvent(new InputEvent('input',{bubbles:true,composed:true,data:t,inputType:'insertText'}));
   el.dispatchEvent(new Event('change',{bubbles:true,composed:true}));
 }
@@ -101,7 +158,7 @@ function pasteText(t,target=null){
   }
   if(el.isContentEditable){ dispatchCEInsert(el,t); return; }
   if(el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&/text|search|url|email|tel|password/.test(el.type||'text'))){
-    insertIntoTextControl(el,t); return;
+    pasteTextIntoInput(el,t); return;
   }
   try{ el.focus({preventScroll:true}); }catch(_){}
   execCommandInsertFallback(t);
@@ -134,9 +191,7 @@ function tryStop(){ if(!recognition) return; try{ recognition.stop(); }catch(_){
 function onKeyDown(e){
   if(e.repeat) return;
   if(!pressedMatches(e)) return;
-  e.preventDefault();
-  e.stopPropagation();
-  if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+  e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation();
   if(holdDown) return;
   holdDown=true;
   targetEl=resolveSpecialHosts(deepActive());
@@ -146,9 +201,7 @@ function onKeyDown(e){
 
 function onKeyUp(e){
   if(!pressedMatches(e)) return;
-  e.preventDefault();
-  e.stopPropagation();
-  if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+  e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation) e.stopImmediatePropagation();
   if(!holdDown) return;
   holdDown=false;
   tryStop();
@@ -164,5 +217,6 @@ function addKeyListeners(){
 }
 
 chrome.storage.onChanged.addListener((c,a)=>{ if(a==='local'&&(c.va_settings_v1||c.va_hotkey_v1)) sync(); });
+window.addEventListener('pagehide',()=>{ try{ recognition?.stop(); }catch(_){} });
 
 (async()=>{ await sync(); addKeyListeners(); })();
